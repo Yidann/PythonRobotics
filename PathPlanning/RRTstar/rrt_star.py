@@ -65,6 +65,8 @@ class RRT():
 
         # generate coruse
         lastIndex = self.get_best_last_index()
+        if lastIndex is None:
+            return None
         path = self.gen_final_course(lastIndex)
         return path
 
@@ -124,6 +126,9 @@ class RRT():
             node.x, node.y) for node in self.nodeList]
         goalinds = [disglist.index(i) for i in disglist if i <= self.expandDis]
         #  print(goalinds)
+
+        if len(goalinds) == 0:
+            return None
 
         mincost = min([self.nodeList[i].cost for i in goalinds])
         for i in goalinds:

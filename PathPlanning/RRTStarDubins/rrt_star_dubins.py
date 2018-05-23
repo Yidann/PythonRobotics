@@ -66,6 +66,10 @@ class RRT():
         # generate coruse
         lastIndex = self.get_best_last_index()
         #  print(lastIndex)
+
+        if lastIndex is None:
+            return None
+
         path = self.gen_final_course(lastIndex)
         return path
 
@@ -153,6 +157,9 @@ class RRT():
         for i in goalinds:
             if abs(self.nodeList[i].yaw - self.end.yaw) <= YAWTH:
                 fgoalinds.append(i)
+
+        if len(fgoalinds) == 0:
+            return None
 
         mincost = min([self.nodeList[i].cost for i in fgoalinds])
         for i in fgoalinds:

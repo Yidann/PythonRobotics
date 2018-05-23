@@ -1,14 +1,31 @@
-<img src="https://github.com/AtsushiSakai/PythonRobotics/blob/master/icon.png?raw=true" align="right" width="300"/>
+<img src="https://github.com/AtsushiSakai/PythonRobotics/raw/master/icon.png?raw=true" align="right" width="300"/>
 
 # PythonRobotics
 [![Build Status](https://travis-ci.org/AtsushiSakai/PythonRobotics.svg?branch=master)](https://travis-ci.org/AtsushiSakai/PythonRobotics)
 
 Python codes for robotics algorithm.
 
-# Table of Contents
 
+# Table of Contents
+   * [What is this?](#what-is-this)
    * [Requirements](#requirements)
    * [How to use](#how-to-use)
+   * [Localization](#localization)
+      * [Extended Kalman Filter localization](#extended-kalman-filter-localization)
+      * [Unscented Kalman Filter localization](#unscented-kalman-filter-localization)
+      * [Particle filter localization](#particle-filter-localization)
+      * [Histogram filter localization](#histogram-filter-localization)
+   * [Mapping](#mapping)
+      * [Gaussian grid map](#gaussian-grid-map)
+      * [Ray casting grid map](#ray-casting-grid-map)
+      * [k-means object clustering](#k-means-object-clustering)
+      * [Object shape recognition using circle fitting](#object-shape-recognition-using-circle-fitting)
+   * [SLAM](#slam)
+      * [Iterative Closest Point (ICP) Matching](#iterative-closest-point-icp-matching)
+      * [EKF SLAM](#ekf-slam)
+      * [FastSLAM 1.0](#fastslam-10)
+      * [FastSLAM 2.0](#fastslam-20)
+      * [Graph based SLAM](#graph-based-slam)
    * [Path Planning](#path-planning)
       * [Dynamic Window Approach](#dynamic-window-approach)
       * [Grid based search](#grid-based-search)
@@ -31,20 +48,37 @@ Python codes for robotics algorithm.
          * [RRT* with dubins path](#rrt-with-dubins-path-1)
          * [RRT* with reeds-sheep path](#rrt-with-reeds-sheep-path)
          * [Closed Loop RRT*](#closed-loop-rrt)
+         * [LQR-RRT*](#lqr-rrt)
       * [Cubic spline planning](#cubic-spline-planning)
+      * [B-Spline planning](#b-spline-planning)
       * [Bezier path planning](#bezier-path-planning)
       * [Quintic polynomials planning](#quintic-polynomials-planning)
       * [Dubins path planning](#dubins-path-planning)
       * [Reeds Shepp planning](#reeds-shepp-planning)
+      * [LQR based path planning](#lqr-based-path-planning)
       * [Optimal Trajectory in a Frenet Frame](#optimal-trajectory-in-a-frenet-frame)
-      * [Mix Integer Optimization based model predictive planning and control](#mix-integer-optimization-based-model-predictive-planning-and-control)
    * [Path tracking](#path-tracking)
       * [Pure pursuit tracking](#pure-pursuit-tracking)
       * [Stanley control](#stanley-control)
       * [Rear wheel feedback control](#rear-wheel-feedback-control)
-      * [Linear–quadratic regulator (LQR) control](#linearquadratic-regulator-lqr-control)
+      * [Linear–quadratic regulator (LQR) steering control](#linearquadratic-regulator-lqr-steering-control)
+      * [Linear–quadratic regulator (LQR) speed and steering control](#linearquadratic-regulator-lqr-speed-and-steering-control)
+      * [Model predictive speed and steering control](#model-predictive-speed-and-steering-control)
    * [License](#license)
-   * [Author](#author)
+   * [Contribution](#contribution)
+   * [Authors](#authors)
+
+# What is this?
+
+This is a Python code collection of robotics algorithms, especially autonomous navigation.
+
+Feature:
+
+1. Widely used and practical algorithms are selected.
+
+2. Minimum dependency.
+
+3. Easy to read for understanding each algorithm's basic idea.
 
 # Requirements
 
@@ -58,9 +92,7 @@ Python codes for robotics algorithm.
 
 - pandas
 
-- [pyReedsShepp](https://github.com/ghliu/pyReedsShepp) (Only for reeds sheep path and RRTStarCar_reeds_sheep)
-
-- [cvxpy](https://cvxgrp.github.io/cvxpy/index.html) (Only for mix integer optimization based model predictive planning and control)
+- [cvxpy 0.4.x](http://www.cvxpy.org/en/latest/) 
 
 # How to use
 
@@ -72,10 +104,196 @@ Python codes for robotics algorithm.
 
 4. Add star to this repo if you like it :smiley:. 
 
+# Localization
+
+## Extended Kalman Filter localization
+
+<img src="https://github.com/AtsushiSakai/PythonRobotics/raw/master/Localization/extended_kalman_filter/animation.gif" width="640">
+
+This is a sensor fusion localization with Extended Kalman Filter(EKF).
+
+The blue line is true trajectory, the black line is dead reckoning trajectory,
+
+the green point is positioning observation (ex. GPS), and the red line is estimated trajectory with EKF.
+
+The red ellipse is estimated covariance ellipse with EKF.
+
+Ref:
+
+- [PROBABILISTIC ROBOTICS](http://www.probabilistic-robotics.org/)
+
+## Unscented Kalman Filter localization
+
+![2](https://github.com/AtsushiSakai/PythonRobotics/raw/master/Localization/unscented_kalman_filter/animation.gif)
+
+This is a sensor fusion localization with Unscented Kalman Filter(UKF).
+
+The lines and points are same meaning of the EKF simulation.
+
+Ref:
+
+- [Discriminatively Trained Unscented Kalman Filter for Mobile Robot Localization](https://www.researchgate.net/publication/267963417_Discriminatively_Trained_Unscented_Kalman_Filter_for_Mobile_Robot_Localization)
+
+
+## Particle filter localization
+
+![2](https://github.com/AtsushiSakai/PythonRobotics/raw/master/Localization/particle_filter/animation.gif)
+
+This is a sensor fusion localization with Particle Filter(PF).
+
+The blue line is true trajectory, the black line is dead reckoning trajectory,
+
+and the red line is estimated trajectory with PF.
+
+It is assumed that the robot can measure a distance from landmarks (RFID).
+
+This measurements are used for PF localization.
+
+Ref:
+
+- [PROBABILISTIC ROBOTICS](http://www.probabilistic-robotics.org/)
+
+
+## Histogram filter localization
+
+![3](https://github.com/AtsushiSakai/PythonRobotics/raw/master/Localization/histogram_filter/animation.gif)
+
+This is a 2D localization example with Histogram filter.
+
+The red cross is true position, black points are RFID positions.
+
+The blue grid shows a position probability of histogram filter.  
+
+In this simulation, x,y are unknown, yaw is known.
+
+The filter integrates speed input and range observations from RFID for localization.
+
+Initial position is not needed.
+
+Ref:
+
+- [PROBABILISTIC ROBOTICS](http://www.probabilistic-robotics.org/)
+
+# Mapping
+
+## Gaussian grid map
+
+This is a 2D Gaussian grid mapping example.
+
+![2](https://github.com/AtsushiSakai/PythonRobotics/raw/master/Mapping/gaussian_grid_map/animation.gif)
+
+## Ray casting grid map
+
+This is a 2D ray casting grid mapping example.
+
+![2](https://github.com/AtsushiSakai/PythonRobotics/raw/master/Mapping/raycasting_grid_map/animation.gif)
+
+## k-means object clustering
+
+This is a 2D object clustering with k-means algorithm.
+
+![2](https://github.com/AtsushiSakai/PythonRobotics/raw/master/Mapping/kmeans_clustering/animation.gif)
+
+## Object shape recognition using circle fitting
+
+This is a object shape recognition using circle fitting.
+
+![2](https://github.com/AtsushiSakai/PythonRobotics/raw/master/Mapping/circle_fitting/animation.gif)
+
+The blue circle is the true object shape.
+
+The red crosses are observations from a ranging sensor.
+
+The red circle is the estimated object shape using circle fitting.
+
+# SLAM
+
+Simultaneous Localization and Mapping(SLAM) examples
+
+## Iterative Closest Point (ICP) Matching
+
+This is a 2D ICP matching example with singular value decomposition.
+
+It can calculate a rotation matrix and a translation vector between points to points.
+
+![3](https://github.com/AtsushiSakai/PythonRobotics/raw/master/SLAM/iterative_closest_point/animation.gif)
+
+Ref:
+
+- [Introduction to Mobile Robotics: Iterative Closest Point Algorithm](https://cs.gmu.edu/~kosecka/cs685/cs685-icp.pdf)
+
+
+## EKF SLAM
+
+This is a Extended Kalman Filter based SLAM example.
+
+The blue line is ground truth, the black line is dead reckoning, the red line is the estimated trajectory with EKF SLAM.
+
+The green cross are estimated landmarks.
+
+![3](https://github.com/AtsushiSakai/PythonRobotics/raw/master/SLAM/EKFSLAM/animation.gif)
+
+Ref:
+
+- [PROBABILISTIC ROBOTICS](http://www.probabilistic-robotics.org/)
+
+## FastSLAM 1.0
+
+This is a feature based SLAM example using FastSLAM 1.0.
+
+The blue line is ground truth, the black line is dead reckoning, the red line is the estimated trajectory with FastSLAM.
+
+The red points are particles of FastSLAM.
+
+Black points are landmarks, blue crosses are estimated landmark positions by FastSLAM.
+
+
+![3](https://github.com/AtsushiSakai/PythonRobotics/raw/master/SLAM/FastSLAM1/animation.gif)
+
+
+Ref:
+
+- [PROBABILISTIC ROBOTICS](http://www.probabilistic-robotics.org/)
+
+- [SLAM simulations by Tim Bailey](http://www-personal.acfr.usyd.edu.au/tbailey/software/slam_simulations.htm)
+
+## FastSLAM 2.0
+
+This is a feature based SLAM example using FastSLAM 2.0.
+
+The animation has same meanings as one of FastSLAM 1.0.
+
+
+![3](https://github.com/AtsushiSakai/PythonRobotics/raw/master/SLAM/FastSLAM2/animation.gif)
+
+
+Ref:
+
+- [PROBABILISTIC ROBOTICS](http://www.probabilistic-robotics.org/)
+
+- [SLAM simulations by Tim Bailey](http://www-personal.acfr.usyd.edu.au/tbailey/software/slam_simulations.htm)
+
+
+## Graph based SLAM
+
+This is a graph based SLAM example.
+
+The blue line is ground truth.
+
+The black line is dead reckoning.
+
+The red line is the estimated trajectory with Graph based SLAM.
+
+The black stars are landmarks for graph edge generation.
+
+![3](https://github.com/AtsushiSakai/PythonRobotics/raw/master/SLAM/GraphBasedSLAM/animation.gif)
+
+Ref:
+
+- [A Tutorial on Graph-Based SLAM](http://www2.informatik.uni-freiburg.de/~stachnis/pdf/grisetti10titsmag.pdf)
+
 
 # Path Planning
-
-Path planning algorithm.
 
 ## Dynamic Window Approach
 
@@ -83,9 +301,8 @@ This is a 2D navigation sample code with Dynamic Window Approach.
 
 - [The Dynamic Window Approach to Collision Avoidance](https://www.ri.cmu.edu/pub_files/pub1/fox_dieter_1997_1/fox_dieter_1997_1.pdf)
 
-![2](https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathPlanning/DynamicWindowApproach/animation.gif)
+![2](https://github.com/AtsushiSakai/PythonRobotics/raw/master/PathPlanning/DynamicWindowApproach/animation.gif)
 
- 
 
 ## Grid based search
 
@@ -93,7 +310,7 @@ This is a 2D navigation sample code with Dynamic Window Approach.
 
 This is a 2D grid based shortest path planning with Dijkstra's algorithm.
 
-![PythonRobotics/figure_1.png at master · AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathPlanning/Dijkstra/animation.gif)
+![PythonRobotics/figure_1.png at master · AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRobotics/raw/master/PathPlanning/Dijkstra/animation.gif)
 
 In the animation, cyan points are searched nodes.
 
@@ -101,7 +318,7 @@ In the animation, cyan points are searched nodes.
 
 This is a 2D grid based shortest path planning with A star algorithm.
 
-![PythonRobotics/figure_1.png at master · AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathPlanning/AStar/animation.gif)
+![PythonRobotics/figure_1.png at master · AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRobotics/raw/master/PathPlanning/AStar/animation.gif)
 
 In the animation, cyan points are searched nodes.
 
@@ -111,14 +328,13 @@ It's heuristic is 2D Euclid distance.
 
 This is a 2D grid based path planning with Potential Field algorithm.
 
-![PotentialField](https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathPlanning/PotentialFieldPlanning/animation.gif)
+![PotentialField](https://github.com/AtsushiSakai/PythonRobotics/raw/master/PathPlanning/PotentialFieldPlanning/animation.gif)
 
 In the animation, the blue heat map shows potential value on each grid.
 
 Ref:
 
 - [Robotic Motion Planning:Potential Functions](https://www.cs.cmu.edu/~motionplanning/lecture/Chap4-Potential-Field_howie.pdf)
-
 
 
 ## Model Predictive Trajectory Generator
@@ -129,17 +345,16 @@ This algorithm is used for state lattice planner.
 
 ### Path optimization sample
 
-![PythonRobotics/figure_1.png at master · AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathPlanning/ModelPredictiveTrajectoryGenerator/kn05animation.gif)
+![PythonRobotics/figure_1.png at master · AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRobotics/raw/master/PathPlanning/ModelPredictiveTrajectoryGenerator/kn05animation.gif)
 
 ### Lookup table generation sample
 
-![PythonRobotics/figure_1.png at master · AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathPlanning/ModelPredictiveTrajectoryGenerator/lookuptable.png?raw=True)
+![PythonRobotics/figure_1.png at master · AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRobotics/raw/master/PathPlanning/ModelPredictiveTrajectoryGenerator/lookuptable.png?raw=True)
 
 Ref: 
 
 - [Optimal rough terrain trajectory generation for wheeled mobile robots](http://journals.sagepub.com/doi/pdf/10.1177/0278364906075328)
 
-　
 
 ## State Lattice Planning
 
@@ -150,21 +365,21 @@ This code uses the model predictive trajectory generator to solve boundary probl
 
 ### Uniform polar sampling
 
-![PythonRobotics/figure_1.png at master · AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathPlanning/StateLatticePlanner/UniformPolarSampling.gif)
+![PythonRobotics/figure_1.png at master · AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRobotics/raw/master/PathPlanning/StateLatticePlanner/UniformPolarSampling.gif)
 
 
 ### Biased polar sampling
 
-![PythonRobotics/figure_1.png at master · AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathPlanning/StateLatticePlanner/BiasedPolarSampling.gif)
+![PythonRobotics/figure_1.png at master · AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRobotics/raw/master/PathPlanning/StateLatticePlanner/BiasedPolarSampling.gif)
 
 
 ### Lane sampling
 
-![PythonRobotics/figure_1.png at master · AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathPlanning/StateLatticePlanner/LaneSampling.gif)
+![PythonRobotics/figure_1.png at master · AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRobotics/raw/master/PathPlanning/StateLatticePlanner/LaneSampling.gif)
 
 ## Probabilistic Road-Map (PRM) planning 
 
-![PRM](https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathPlanning/ProbabilisticRoadMap/animation.gif)
+![PRM](https://github.com/AtsushiSakai/PythonRobotics/raw/master/PathPlanning/ProbabilisticRoadMap/animation.gif)
 
 This PRM planner uses Dijkstra method for graph search.
 
@@ -181,7 +396,7 @@ Ref:
 　　
 ## Voronoi Road-Map planning 
 
-![VRM](https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathPlanning/VoronoiRoadMap/animation.gif)
+![VRM](https://github.com/AtsushiSakai/PythonRobotics/raw/master/PathPlanning/VoronoiRoadMap/animation.gif)
 
 This Voronoi road-map planner uses Dijkstra method for graph search.
 
@@ -200,7 +415,7 @@ Ref:
 
 ### Basic RRT 
 
-![PythonRobotics/figure_1.png at master · AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathPlanning/RRT/animation.gif)
+![PythonRobotics/figure_1.png at master · AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRobotics/raw/master/PathPlanning/RRT/animation.gif)
 
 This script is a simple path planning code with Rapidly-Exploring Random Trees (RRT)
 
@@ -208,7 +423,7 @@ Black circles are obstacles, green line is a searched tree, red crosses are star
 
 ### RRT\*
 
-![PythonRobotics/figure_1.png at master · AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathPlanning/RRTstar/animation.gif)
+![PythonRobotics/figure_1.png at master · AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRobotics/raw/master/PathPlanning/RRTstar/animation.gif)
 
 This script is a  path planning code with RRT\*
 
@@ -218,36 +433,38 @@ Ref:
 
 - [Incremental Sampling-based Algorithms for Optimal Motion Planning](https://arxiv.org/abs/1005.0416)
 
-- [Sampling-based Algorithms for Optimal Motion Planningj](http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.419.5503&rep=rep1&type=pdf)
+- [Sampling-based Algorithms for Optimal Motion Planning](http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.419.5503&rep=rep1&type=pdf)
 
 
 ### RRT with dubins path 
 
-![PythonRobotics](https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathPlanning/RRTDubins/animation.gif)
+![PythonRobotics](https://github.com/AtsushiSakai/PythonRobotics/raw/master/PathPlanning/RRTDubins/animation.gif)
 
 Path planning for a car robot with RRT and dubins path planner.
 
 
 ### RRT\* with dubins path
 
-![AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathPlanning/RRTStarDubins/animation.gif)
+![AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRobotics/raw/master/PathPlanning/RRTStarDubins/animation.gif)
 
 Path planning for a car robot with RRT\* and dubins path planner.
 
 
 ### RRT\* with reeds-sheep path
 
-![Robotics/animation.gif at master · AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathPlanning/RRTStarReedsShepp/animation.gif))
+![Robotics/animation.gif at master · AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRobotics/raw/master/PathPlanning/RRTStarReedsShepp/animation.gif))
 
 Path planning for a car robot with RRT\* and reeds sheep path planner.
 
 ### Closed Loop RRT\*
 
-A sample code with closed loop RRT\*.
+A vehicle model based path planning with closed loop RRT\*.
 
-![PythonRobotics/figure_1-5.png at master · AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathPlanning/CRRRTStar/Figure_1.png?raw=True)
-![PythonRobotics/figure_1-5.png at master · AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathPlanning/CRRRTStar/Figure_4.png?raw=True)
-![PythonRobotics/figure_1-5.png at master · AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathPlanning/CRRRTStar/Figure_5.png?raw=True)
+![CLRRT](https://github.com/AtsushiSakai/PythonRobotics/raw/master/PathPlanning/ClosedLoopRRTStar/animation.gif)
+
+In this code, pure-pursuit algorithm is used for steering control, 
+
+PID is used for speed control.
 
 Ref:
 
@@ -259,6 +476,21 @@ Autonomous Urban Driving](http://acl.mit.edu/papers/KuwataTCST09.pdf)
 
 - [[1601.06326] Sampling-based Algorithms for Optimal Motion Planning Using Closed-loop Prediction](https://arxiv.org/abs/1601.06326)
 
+### LQR-RRT\*
+
+This is a path planning simulation with LQR-RRT\*.
+
+A double integrator motion model is used for LQR local planner.
+
+![LQRRRT](https://github.com/AtsushiSakai/PythonRobotics/raw/master/PathPlanning/LQRRRTStar/animation.gif)
+
+Ref:
+
+- [LQR\-RRT\*: Optimal Sampling\-Based Motion Planning with Automatically Derived Extension Heuristics](http://lis.csail.mit.edu/pubs/perez-icra12.pdf)
+
+- [MahanFathi/LQR\-RRTstar: LQR\-RRT\* method is used for random motion planning of a simple pendulum in it's phase plot](https://github.com/MahanFathi/LQR-RRTstar)
+
+
 ## Cubic spline planning
 
 A sample code for cubic path planning.
@@ -267,14 +499,14 @@ This code generates a curvature continuous path based on x-y waypoints with cubi
 
 Heading angle of each point can be also calculated analytically.
 
-![PythonRobotics/figure_1.png at master · AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathPlanning/CubicSpline/Figure_1.png?raw=True)
-![PythonRobotics/figure_1.png at master · AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathPlanning/CubicSpline/Figure_2.png?raw=True)
-![PythonRobotics/figure_1.png at master · AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathPlanning/CubicSpline/Figure_3.png?raw=True)
+![PythonRobotics/figure_1.png at master · AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRobotics/raw/master/PathPlanning/CubicSpline/Figure_1.png?raw=True)
+![PythonRobotics/figure_1.png at master · AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRobotics/raw/master/PathPlanning/CubicSpline/Figure_2.png?raw=True)
+![PythonRobotics/figure_1.png at master · AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRobotics/raw/master/PathPlanning/CubicSpline/Figure_3.png?raw=True)
 
 
 ## B-Spline planning
 
-![B-Spline](https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathPlanning/BSplinePath/Figure_1.png?raw=True)
+![B-Spline](https://github.com/AtsushiSakai/PythonRobotics/raw/master/PathPlanning/BSplinePath/Figure_1.png?raw=True)
 
 This is a path planning with B-Spline curse.
 
@@ -292,25 +524,24 @@ A sample code of Bezier path planning.
 
 It is based on 4 control points Beier path.
 
-![Bezier1](https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathPlanning/BezierPath/Figure_1.png?raw=True)
+![Bezier1](https://github.com/AtsushiSakai/PythonRobotics/raw/master/PathPlanning/BezierPath/Figure_1.png?raw=True)
 
 If you change the offset distance from start and end point,
 
 You can get different Beizer course:
 
-![Bezier2](https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathPlanning/BezierPath/Figure_2.png?raw=True)
+![Bezier2](https://github.com/AtsushiSakai/PythonRobotics/raw/master/PathPlanning/BezierPath/Figure_2.png?raw=True)
 
  
-
 Ref:
 
-- [Continuous Curvature Path Generation Based on B ́ezier Curves for Autonomous Vehicles](http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.294.6438&rep=rep1&type=pdf)
+- [Continuous Curvature Path Generation Based on Bezier Curves for Autonomous Vehicles](http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.294.6438&rep=rep1&type=pdf)
 
 ## Quintic polynomials planning
 
 Motion planning with quintic polynomials.
 
-![2](https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathPlanning/QuinticPolynomialsPlanner/animation.gif)
+![2](https://github.com/AtsushiSakai/PythonRobotics/raw/master/PathPlanning/QuinticPolynomialsPlanner/animation.gif)
 
 It can calculate 2D path, velocity, and acceleration profile based on quintic polynomials.
 
@@ -323,10 +554,7 @@ Ref:
 
 A sample code for Dubins path planning.
 
-
-![PythonRobotics/figure_1.png at master · AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathPlanning/DubinsPath/figures/figure_1.png?raw=True)
-![PythonRobotics/figure_1.png at master · AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathPlanning/DubinsPath/figures/figure_13.png?raw=True)
-![PythonRobotics/figure_1.png at master · AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathPlanning/DubinsPath/figures/figure_15.png?raw=True)
+![dubins](https://github.com/AtsushiSakai/PythonRobotics/raw/master/PathPlanning/DubinsPath/animation.gif?raw=True)
 
 Ref:
 
@@ -336,9 +564,7 @@ Ref:
 
 A sample code with Reeds Shepp path planning.
 
-![PythonRobotics/figure_1-5.png at master · AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathPlanning/ReedsSheppPath/figure_1-4.png?raw=true)
-![PythonRobotics/figure_1-5.png at master · AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathPlanning/ReedsSheppPath/figure_1-5.png?raw=true)
-![PythonRobotics/figure_1-5.png at master · AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathPlanning/ReedsSheppPath/figure_1-7.png?raw=true)
+![RSPlanning](https://github.com/AtsushiSakai/PythonRobotics/raw/master/PathPlanning/ReedsSheppPath/animation.gif?raw=true)
 
 Ref:
 
@@ -349,9 +575,16 @@ Ref:
 - [ghliu/pyReedsShepp: Implementation of Reeds Shepp curve\.](https://github.com/ghliu/pyReedsShepp)
 
 
+## LQR based path planning
+
+A sample code using LQR based path planning for double integrator model.
+
+![RSPlanning](https://github.com/AtsushiSakai/PythonRobotics/raw/master/PathPlanning/LQRPlanner/animation.gif?raw=true)
+
+
 ## Optimal Trajectory in a Frenet Frame 
 
-![3](https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathPlanning/FrenetOptimalTrajectory/animation.gif)
+![3](https://github.com/AtsushiSakai/PythonRobotics/raw/master/PathPlanning/FrenetOptimalTrajectory/animation.gif)
 
 This is optimal trajectory generation in a Frenet Frame.
 
@@ -366,41 +599,25 @@ Ref:
 - [Optimal trajectory generation for dynamic street scenarios in a Frenet Frame](https://www.youtube.com/watch?v=Cj6tAQe7UCY)
 
 
-
-## Mix Integer Optimization based model predictive planning and control
-
-![2](https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathPlanning/MixIntegerPathPlanning/animation.gif)
-
-A model predictive planning and control code with mixed integer programming.
-
-It is based on this paper.
-
-- [MIXED INTEGER PROGRAMMING FOR MULTI-VEHICLE PATH PLANNING](http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.4.2591&rep=rep1&type=pdf)
-
-This code used cvxpy as optimization modeling tool,
-
-- [Welcome to CVXPY 1\.0 — CVXPY 1\.0\.0 documentation](https://cvxgrp.github.io/cvxpy/index.html)
-
-Gurobi is used as a solver for mix integer optimization problem.
-
-- [Gurobi Optimization \- The State\-of\-the\-Art Mathematical Programming Solver](http://www.gurobi.com/)
- 
-
 # Path tracking
-
-Path tracking algorithm samples.
 
 ## Pure pursuit tracking
 
 Path tracking simulation with pure pursuit steering control and PID speed control.
 
-![2](https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathTracking/pure_pursuit/animation.gif)
+![2](https://github.com/AtsushiSakai/PythonRobotics/raw/master/PathTracking/pure_pursuit/animation.gif)
+
+The red line is a target course, the green cross means the target point for pure pursuit control, the blue line is the tracking.
+
+Ref:
+
+- [A Survey of Motion Planning and Control Techniques for Self-driving Urban Vehicles](https://arxiv.org/abs/1604.07446)
 
 ## Stanley control
 
 Path tracking simulation with Stanley steering control and PID speed control.
 
-![2](https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathTracking/stanley_controller/animation.gif)
+![2](https://github.com/AtsushiSakai/PythonRobotics/raw/master/PathTracking/stanley_controller/animation.gif)
 
 Ref:
 
@@ -414,20 +631,82 @@ Ref:
 
 Path tracking simulation with rear wheel feedback steering control and PID speed control.
 
-![PythonRobotics/figure_1.png at master · AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathTracking/rear_wheel_feedback/animation.gif)
+![PythonRobotics/figure_1.png at master · AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRobotics/raw/master/PathTracking/rear_wheel_feedback/animation.gif)
 
-## Linear–quadratic regulator (LQR) control
+Ref:
+
+- [A Survey of Motion Planning and Control Techniques for Self-driving Urban Vehicles](https://arxiv.org/abs/1604.07446)
+
+
+## Linear–quadratic regulator (LQR) steering control
 
 Path tracking simulation with LQR steering control and PID speed control.
 
-![PythonRobotics/figure_1.png at master · AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathTracking/lqr_steer_control/animation.gif)
+![PythonRobotics/figure_1.png at master · AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRobotics/raw/master/PathTracking/lqr_steer_control/animation.gif)
 
+Ref:
+
+- [ApolloAuto/apollo: An open autonomous driving platform](https://github.com/ApolloAuto/apollo)
+
+
+## Linear–quadratic regulator (LQR) speed and steering control
+
+Path tracking simulation with LQR speed and steering control.
+
+![3](https://github.com/AtsushiSakai/PythonRobotics/raw/master/PathTracking/lqr_speed_steer_control/animation.gif)
+
+Ref:
+
+- [Towards fully autonomous driving: Systems and algorithms \- IEEE Conference Publication](http://ieeexplore.ieee.org/document/5940562/)
+
+
+## Model predictive speed and steering control
+
+Path tracking simulation with iterative linear model predictive speed and steering control.
+
+<img src="https://github.com/AtsushiSakai/PythonRobotics/raw/master/PathTracking/model_predictive_speed_and_steer_control/animation.gif" width="640">
+
+This code uses cvxpy as an optimization modeling tool.
+
+- [Welcome to CVXPY](http://www.cvxpy.org/en/latest/)
+
+Ref:
+
+- [Vehicle Dynamics and Control \| Rajesh Rajamani \| Springer](http://www.springer.com/us/book/9781461414322)
+
+- [MPC Course Material \- MPC Lab @ UC\-Berkeley](http://www.mpc.berkeley.edu/mpc-course-material)
+
+ 
 
 # License 
 
 MIT
 
-# Author
+# Contribution
 
-Atsushi Sakai ([@Atsushi_twi](https://twitter.com/Atsushi_twi))
+If you have any quesions or problems about this code, feel free to add an issue.
+
+A small PR like bug fix is welcome.
+
+If your PR is merged multiple times, I will add your account to the author list.
+
+You can support financially this project via PayPal.
+
+[![Support via PayPal](https://cdn.rawgit.com/twolfson/paypal-github-button/1.0.0/dist/button.svg)](https://www.paypal.me/myenigmapay/)
+
+# Authors
+
+- [Atsushi Sakai](https://github.com/AtsushiSakai/) ([@Atsushi_twi](https://twitter.com/Atsushi_twi))
+
+- [Daniel Ingram](https://github.com/daniel-s-ingram)
+
+- [Joe Dinius](https://github.com/jwdinius)
+
+
+
+
+
+
+
+
 

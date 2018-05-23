@@ -1,7 +1,7 @@
 """
 Model trajectory generator
 
-author: Atsushi Sakai
+author: Atsushi Sakai(@Atsushi_twi)
 """
 
 import numpy as np
@@ -14,7 +14,7 @@ max_iter = 100
 h = np.matrix([0.5, 0.02, 0.02]).T  # parameter sampling distanse
 cost_th = 0.1
 
-show_graph = False
+show_animation = False
 
 
 def plot_arrow(x, y, yaw, length=1.0, width=0.5, fc="r", ec="k"):
@@ -42,7 +42,7 @@ def calc_J(target, p, h, k0):
     xn, yn, yawn = motion_model.generate_last_state(
         p[0, 0] - h[0, 0], p[1, 0], p[2, 0], k0)
     dn = calc_diff(target, [xn], [yn], [yawn])
-    d1 = np.matrix((dp - dn) / (2.0 * h[1, 0])).T
+    d1 = np.matrix((dp - dn) / (2.0 * h[0, 0])).T
 
     xp, yp, yawp = motion_model.generate_last_state(
         p[0, 0], p[1, 0] + h[1, 0], p[2, 0], k0)
@@ -50,7 +50,7 @@ def calc_J(target, p, h, k0):
     xn, yn, yawn = motion_model.generate_last_state(
         p[0, 0], p[1, 0] - h[1, 0], p[2, 0], k0)
     dn = calc_diff(target, [xn], [yn], [yawn])
-    d2 = np.matrix((dp - dn) / (2.0 * h[2, 0])).T
+    d2 = np.matrix((dp - dn) / (2.0 * h[1, 0])).T
 
     xp, yp, yawp = motion_model.generate_last_state(
         p[0, 0], p[1, 0], p[2, 0] + h[2, 0], k0)
@@ -122,7 +122,7 @@ def optimize_trajectory(target, k0, p):
         p += alpha * np.array(dp)
         #  print(p.T)
 
-        if show_graph:
+        if show_animation:
             show_trajectory(target, xc, yc)
     else:
         xc, yc, yawc, p = None, None, None, None
